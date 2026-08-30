@@ -30,14 +30,6 @@ def p32(v: int) -> bytes:
     return (v & 0xFFFFFFFF).to_bytes(4, "little")
 
 
-def load_names() -> dict[int, str]:
-    global _NAMES
-    if _NAMES is None:
-        raw = json.loads(_NAMES_PATH.read_text(encoding="utf-8")) if _NAMES_PATH.is_file() else {}
-        _NAMES = {int(k, 16): v for k, v in raw.items()}
-    return _NAMES
-
-
 def _mix(a: int, b: int, c: int) -> tuple[int, int, int]:
     a = (a - c - b) & 0xFFFFFFFF
     a ^= c >> 13
@@ -110,6 +102,14 @@ def hash_section(inner: str) -> int:
     if m:
         return int(m.group(1), 16)
     return lookup3((inner if inner.endswith(":") else f"[{inner}]").encode("latin-1"))
+
+
+def load_names() -> dict[int, str]:
+    global _NAMES
+    if _NAMES is None:
+        raw = json.loads(_NAMES_PATH.read_text(encoding="utf-8")) if _NAMES_PATH.is_file() else []
+        _NAMES = {lookup3(n.encode("latin-1")): n for n in raw}
+    return _NAMES
 
 
 def rc4(data: bytes, key: bytes = _TEXT_KEY) -> bytes:
