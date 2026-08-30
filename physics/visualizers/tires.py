@@ -36,7 +36,7 @@ def parse_slipcurves(text: str) -> dict[str, dict]:
                 step = float(m.group(1))
             elif m := _VALS.match(line):
                 data += nums(f"({m.group(1)})")
-            elif re.match(r"^Data\s*:", line, re.I):
+            elif re.match(r"^\[DATA", line, re.I) or re.match(r"^Data\s*:", line, re.I):
                 in_data = True
             elif in_data:
                 if not line or line.startswith("["):

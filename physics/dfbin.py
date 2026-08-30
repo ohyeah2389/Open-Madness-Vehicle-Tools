@@ -477,18 +477,13 @@ def to_text(recs: list[dict], pool: bytes, names: dict[int, str]) -> str:
                 lines.append("")
             lines.append(section_label(rec["id"], names))
         elif rec["kind"] == "enc0":
-            lines.append(" ".join(fmt_elem(t, v) for t, v in rec["vals"]))
+            lines.extend(fmt_elem(t, v) for t, v in rec["vals"])
         else:
             if rec.get("bit7") and lines and lines[-1] != "":
                 lines.append("")
-            parts = []
-            note = ""
             for pid, t, raw in rec["items"]:
                 name = param_label(pid, names)
-                parts.append(f"{name}={fmt_scalar(t, raw, pool)}")
-                if t == 3:
-                    note = "  # t=3"
-            lines.append(" ".join(parts) + note)
+                lines.append(f"{name}={fmt_scalar(t, raw, pool)}" + ("  # t=3" if t == 3 else ""))
     return "\n".join(lines) + ("\n" if lines else "")
 
 
