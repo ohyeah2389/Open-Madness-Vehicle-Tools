@@ -5,6 +5,7 @@ import json
 import re
 import struct
 from pathlib import Path
+from typing import Literal
 
 MAGIC = b"ShCB"
 VERSION = 0x53DD0FE6
@@ -243,7 +244,7 @@ def _dec_s(t: int, b: bytes):
     return None
 
 
-def value_size(t: int, ptr: bytes) -> int:
+def value_size(t: int, ptr: bytes) -> int | None:
     return {0: 1, 1: 4, 2: 4, 3: 8, 6: 1, 7: 2, 8: 0, 9: 0, 10: 12, 11: 16, 12: 0, 13: 0, 14: 8, 15: 0}.get(
         t, packed_size(ptr) if t in (4, 5) else None
     )
@@ -320,6 +321,7 @@ def parse_stream(payload: bytes) -> list[dict]:
                 b = rec[1 + (i >> 1)]
                 t = (b & 0x0F) if (i & 1) == 0 else ((b >> 4) & 0x0F)
                 sz = value_size(t, rec[p + 4 :])
+                assert sz is not None
                 items.append((u32(rec, p), t, rec[p + 4 : p + 4 + sz]))
                 p += 4 + sz
             recs.append({"kind": "params", "items": items, "bit7": bit7})
@@ -564,7 +566,15 @@ def _parse_string(s: str, i: int) -> tuple[str, int]:
     return s[i:j], j
 
 
-def _parse_value(s: str, i: int):
+_Val = (
+    tuple[Literal["flag"], int]
+    | tuple[Literal["pack"], list[tuple[str, int | float]]]
+    | tuple[Literal["str"], str]
+    | tuple[Literal["num"], tuple[str, int | float]]
+)
+
+
+def _parse_value(s: str, i: int) -> tuple[_Val, int]:
     while i < len(s) and s[i].isspace():
         i += 1
     if i >= len(s):
@@ -584,7 +594,7 @@ def _parse_value(s: str, i: int):
     return ("str", text), i
 
 
-def _parse_assignments(s: str) -> list[tuple[str, object]]:
+def _parse_assignments(s: str) -> list[tuple[str, _Val]]:
     items = []
     i, n = 0, len(s)
     while i < n:
@@ -649,13 +659,12 @@ def parse_text(text: str) -> list[dict]:
         items = []
         for name, val in _parse_assignments(line):
             pid = hash_name(name)
-            kind = val[0]
-            if kind == "flag" or (kind == "num" and val[1][0] == "i" and val[1][1] == 0 and t_over is None):
+            if val[0] == "flag" or (val[0] == "num" and val[1] == ("i", 0) and t_over is None):
                 items.append((pid, 8, b""))
-            elif kind == "pack":
+            elif val[0] == "pack":
                 packed = encode_packed([_infer_elem(k, v) for k, v in val[1]])
                 items.append((pid, t_over or 4, packed))
-            elif kind == "str":
+            elif val[0] == "str":
                 items.append((pid, 6, val[1]))
             else:
                 nk, nv = val[1]
