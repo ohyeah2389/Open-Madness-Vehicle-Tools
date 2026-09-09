@@ -31,6 +31,29 @@ This subfolder contains a few Python scripts providing visualization of vehicle 
 - `tires.py` provides visualization of a tire's slip curves, but only the ones from the `.HDT`, which are unused in PC2/AMS2 as they're overridden by the SETA tire model
 - `_util.py` is a common utility library for the visualizer scripts
 
+## Requirements
+The scripts are written for Python 3.10 or later. The physics packing and unpacking scripts use the standard library only. The visualizer scripts need `matplotlib` and `numpy`.
+
+## Usage
+Run the scripts from the repository root. If you omit the output path, `*.*dfbin` unpacks by dropping `bin` (`.edfbin` → `.edf`) and `.vdfm` unpacks to `.vdf`. Packing does the opposite, automatically.
+
+```
+python physics/unpack.py path/to/car.edfbin
+python physics/unpack.py path/to/car.vdfm
+python physics/pack.py path/to/car.edf
+python physics/pack.py path/to/car.vdf
+```
+
+Visualizers work off of decoded text. Passing a `.vdf` automatically looks up the linked engine, gearbox, suspension, and chassis files. Pass `-o plot.png` to write an image of the plot instead of opening a window showing the plot.
+
+```
+python physics/visualizers/engine.py path/to/car.edf
+python physics/visualizers/engine.py path/to/car.vdf
+python physics/visualizers/gears.py path/to/car.vdf
+python physics/visualizers/geometry.py path/to/car.vdf
+python physics/visualizers/tires.py path/to/tyre.hdt
+```
+
 ## License
 This project is free software, licensed under [GPL-3.0-or-later](LICENSE) with an [output exception](LICENSE-EXCEPTION.txt).
 
