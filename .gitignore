@@ -1,2 +1,42 @@
 __pycache__/
+*.py[cod]
+.venv/
+venv/
+.vscode/
 Art/
+
+# Packed physics
+*.adfbin
+*.bbfbin
+*.cdfbin
+*.cmfbin
+*.edfbin
+*.fmfbin
+*.gdfbin
+*.hdtbin
+*.sdfbin
+*.tbfbin
+*.txtbin
+*.vdfm
+*.mrdf
+tire.bin
+
+# Unpacked physics
+*.adf
+*.bbf
+*.cdf
+*.cmf
+*.edf
+*.fmf
+*.gdf
+*.hdt
+*.mrd
+*.sdf
+*.tbf
+*.vdf
+
+# Other files
+*.bin
+*.rg
+*.xml
+tire
