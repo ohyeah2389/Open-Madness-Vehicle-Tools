@@ -17,10 +17,11 @@ This repository is intended to contain a variety of tools relating to vehicle de
 
 ### `./physics`
 This subfolder contains a few Python scripts enabling decoding and encoding of the vehicle physics parameter files used by the game engine:
-- `unpack.py` provides decode of `*.*dfbin` and `*.vdfm` files to human-readable and editable versions using the included codec scripts
-- `pack.py` provides encode of the human-readable and editable versions of the `*.*dfbin` and `*.vdfm` files back to their original binary-packed versions
+- `unpack.py` provides decode of `*.*dfbin`, `*.vdfm`, and `*.csdbin` files to human-readable and editable versions using the included codec scripts
+- `pack.py` provides encode of the human-readable and editable versions of the `*.*dfbin`, `*.vdfm`, and `*.csdbin` files back to their original binary-packed versions
 - `dfbin.py` is the codec for the `*.*dfbin` `ShCB` file format
 - `vdfm.py` is the codec for the `*.vdfm` `Q02` file format
+- `csdbin.py` is the codec for the `*.csdbin` car sound `Q02` file format
 - `names.json` is a list of short identifier tokens used to reverse lookup3 hashes when unpacking. It was recovered from strings present in game binaries and from dictionary attack against those hashes.
 
 ### `./physics/visualizers`
@@ -35,13 +36,15 @@ This subfolder contains a few Python scripts providing visualization of vehicle 
 The scripts are written for Python 3.10 or later. The physics packing and unpacking scripts use the standard library only. The visualizer scripts need `matplotlib` and `numpy`.
 
 ## Usage
-Run the scripts from the repository root. If you omit the output path, `*.*dfbin` unpacks by dropping `bin` (`.edfbin` → `.edf`) and `.vdfm` unpacks to `.vdf`. Packing does the opposite, automatically.
+Run the scripts from the repository root. If you omit the output path, `*.*dfbin` unpacks by dropping `bin` (`.edfbin` → `.edf`), `.vdfm` unpacks to `.vdf`, and `.csdbin` unpacks to `.csd`. Packing does the opposite, automatically.
 
 ```
 python physics/unpack.py path/to/car.edfbin
 python physics/unpack.py path/to/car.vdfm
+python physics/unpack.py path/to/car.csdbin
 python physics/pack.py path/to/car.edf
 python physics/pack.py path/to/car.vdf
+python physics/pack.py path/to/car.csd
 ```
 
 Visualizers work off of decoded text. Passing a `.vdf` automatically looks up the linked engine, gearbox, suspension, and chassis files. Pass `-o plot.png` to write an image of the plot instead of opening a window showing the plot.
