@@ -11,7 +11,7 @@ This is an unofficial, independent project. It is not affiliated with, authorize
 No game code or vehicle physics data are distributed by this project. You must own a legitimate copy of the target game to use this toolkit.
 
 ## Current Scope
-This repository is intended to contain a variety of tools relating to vehicle development for Madness Engine games. It currently only contains tools relating to vehicle physics development.
+This repository is intended to contain a variety of tools relating to vehicle development for Madness Engine games. It currently contains tools for handling vehicle physics files and the cockpit, Motec display, and pit controller binaries.
 
 ## Contents:
 
@@ -23,6 +23,15 @@ This subfolder contains a few Python scripts enabling decoding and encoding of t
 - `vdfm.py` is the codec for the `*.vdfm` `Q02` file format
 - `csdbin.py` is the codec for the `*.csdbin` car sound `Q02` file format
 - `names.json` is a list of short identifier tokens used to reverse lookup3 hashes when unpacking. It was recovered from strings present in game binaries and from dictionary attack against those hashes.
+
+### `./cockpit`
+This subfolder contains a few Python scripts enabling decoding and encoding of the cockpit, dash-display, and pit-controller binaries:
+- `unpack.py` decodes `*_cockpit.bin`, `motecdisplay.bin`, and `pitcontroller.bin` to editable INI
+- `pack.py` encodes that INI back to the original binary
+- `cockpit_bin.py` is the codec for `*_cockpit.bin` (cameras, gauges, shift animation, RPM LEDs, and the display name the `.bgui` is loaded from)
+- `motecdisplay.py` is the codec for `motecdisplay.bin` (the `_LCD` material, display pages, and bar widgets)
+- `pitcontroller.py` is the codec for `pitcontroller.bin` (pit-stop archive, crew model, outfits, and helmets)
+- `q02.py` is the shared section container
 
 ### `./physics/visualizers`
 This subfolder contains a few Python scripts providing visualization of vehicle physics data (from the decoded files):
@@ -36,7 +45,7 @@ This subfolder contains a few Python scripts providing visualization of vehicle 
 The scripts are written for Python 3.10 or later. The physics packing and unpacking scripts use the standard library only. The visualizer scripts need `matplotlib` and `numpy`.
 
 ## Usage
-Run the scripts from the repository root. If you omit the output path, `*.*dfbin` unpacks by dropping `bin` (`.edfbin` → `.edf`), `.vdfm` unpacks to `.vdf`, and `.csdbin` unpacks to `.csd`. Packing does the opposite, automatically.
+Run the scripts from the repository root. If you omit the output path, `*.*dfbin` unpacks by dropping `bin` (`.edfbin` → `.edf`), `.vdfm` unpacks to `.vdf`, and `.csdbin` unpacks to `.csd`. `*_cockpit.bin`, `motecdisplay.bin`, and `pitcontroller.bin` unpack to `.ini` and pack back to `.bin`. Packing does the opposite, automatically. 
 
 ```
 python physics/unpack.py path/to/car.edfbin
@@ -45,6 +54,12 @@ python physics/unpack.py path/to/car.csdbin
 python physics/pack.py path/to/car.edf
 python physics/pack.py path/to/car.vdf
 python physics/pack.py path/to/car.csd
+python cockpit/unpack.py path/to/car_cockpit.bin
+python cockpit/unpack.py path/to/motecdisplay.bin
+python cockpit/unpack.py path/to/pitcontroller.bin
+python cockpit/pack.py path/to/car_cockpit.ini
+python cockpit/pack.py path/to/motecdisplay.ini
+python cockpit/pack.py path/to/pitcontroller.ini
 ```
 
 Visualizers work off of decoded text. Passing a `.vdf` automatically looks up the linked engine, gearbox, suspension, and chassis files. Pass `-o plot.png` to write an image of the plot instead of opening a window showing the plot.
